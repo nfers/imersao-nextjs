@@ -28,11 +28,12 @@
         }
       ],
       "external": [
-        ""
+        "https://aluraquiz-css.omariosouto.vercel.app/",
+        "https://aluraquiz-devsoutinho.omariosouto.vercel.app/"
       ],
     "theme": {
         "colors": {
-            "primary": "#4CAF50",
+            "primary": "#FF9800",
             "secondary": "#FF9800",
             "mainBg": "#1c1814",
             "contrastText": "#FFFFFF",

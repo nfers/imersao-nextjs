@@ -1,5 +1,19 @@
+import React from 'react'
 import styled from 'styled-components'
+import { useRouter } from 'next/router'
+import Head from 'next/head'
+import { motion } from 'framer-motion'
+
 import db from '../db.json'
+import Widget from '../src/components/Widget'
+import QuizLogo from '../src/components/QuizLogo'
+import Input from '../src/components/Input'
+import Button from '../src/components/Button'
+import Link from '../src/components/Link'
+import Footer from '../src/components/Footer'
+import GitHubCorner from '../src/components/GitHubCorner'
+import QuizBackground from '../src/components/QuizBackground'
+
 
 const Title = styled.h1`
   font-size: 50px;
@@ -11,28 +25,6 @@ const BackgroundImage = styled.div`
   flex: 1;
   background-position: center;
   background-size: cover;
-`;
-
-const Widget = styled.div`
-  margin-top: 24px;
-  margin-bottom: 24px;
-  border: 1px solid #4CAF50;
-  background-color: #1c1814;
-  border-radius: 4px;
-  overflow: hidden;
-
-  h1,h2,h3 {
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 1;
-  }
-
-  p {
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1;
-    margin-bottom: 0;
-  }
 `;
 
 export const QuizContainer = styled.div`
@@ -47,19 +39,100 @@ export const QuizContainer = styled.div`
 `;
 
 export default function Home() {
-  return (
-    <BackgroundImage>
-      <QuizContainer>
-        <Widget>
-          <h1>The legengs</h1>
-          <p>Em desenvolvimento</p>
-        </Widget>
-        <Widget>
-          <h1>The legengs</h1>
-          <p>Em desenvolvimento</p>
-        </Widget>
-      </QuizContainer>
-    </BackgroundImage>
-  )
-}
+  const router = useRouter();
+  const [name, setName] = React.useState('');
 
+  return (
+    <QuizBackground backgroundImage={db.bg2}>
+      <Head>
+        <title>
+          AluraQuiz -
+          {db.title}
+        </title>
+      </Head>
+      <QuizContainer>
+        <QuizLogo />
+        <Widget
+          as={motion.section}
+          transition={{ delay: 0, duration: 0.5 }}
+          variants={{
+            show: { opacity: 1, y: '0' },
+            hidden: { opacity: 0, y: '100%' },
+          }}
+          initial="hidden"
+          animate="show"
+        >
+          <Widget.Header>
+            <h1>{db.title}</h1>
+          </Widget.Header>
+          <Widget.Content>
+            <p>{db.description}</p>
+            <form onSubmit={function (infosDoEvento) {
+              infosDoEvento.preventDefault();
+              router.push(`/quiz?name=${name}`);
+              console.log('Fazendo uma submissão por meio do react');
+            }}
+            >
+              <Input
+                name="nomeDoUsuario"
+                onChange={(infosDoEvento) => setName(infosDoEvento.target.value)}
+                placeholder="Diz ai seu nome"
+                value={name}
+              />
+              <Button type="submit" disabled={name.length === 0}>
+                {`Jogar ${name}`}
+              </Button>
+            </form>
+          </Widget.Content>
+        </Widget>
+
+        <Widget
+          as={motion.section}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          variants={{
+            show: { opacity: 1 },
+            hidden: { opacity: 0 },
+          }}
+          initial="hidden"
+          animate="show"
+        >
+          <Widget.Content>
+            <h1>Quizes da Galera</h1>
+
+            <ul>
+              {db.external.map((linkExterno) => {
+                const [projectName, githubUser] = linkExterno
+                  .replace(/\//g, '')
+                  .replace('https:', '')
+                  .replace('.vercel.app', '')
+                  .split('.');
+
+                return (
+                  <li key={linkExterno}>
+                    <Widget.Topic
+                      as={Link}
+                      href={`/quiz/${projectName}___${githubUser}`}
+                    >
+                      {`${githubUser}/${projectName}`}
+                    </Widget.Topic>
+                  </li>
+                );
+              })}
+            </ul>
+          </Widget.Content>
+        </Widget>
+        <Footer
+          as={motion.footer}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          variants={{
+            show: { opacity: 1 },
+            hidden: { opacity: 0 },
+          }}
+          initial="hidden"
+          animate="show"
+        />
+      </QuizContainer>
+      <GitHubCorner projectUrl="https://github.com/nfers" />
+    </QuizBackground>
+  );
+}
